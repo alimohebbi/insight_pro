@@ -31,8 +31,7 @@ def make_word_cloud(text):
     plt.figure(figsize=(10, 5))
     plt.imshow(wordcloud, interpolation='bilinear')
     plt.axis('off')  # Turn off the axis labels and ticks
-    plt.show()
-    wordcloud.to_file("wordcloud.png")
+    return wordcloud
 
 
 def sentiment_score(lines):
@@ -42,8 +41,6 @@ def sentiment_score(lines):
         sentiment_scores = analyzer.polarity_scores(text)
         scores.append(sentiment_scores['compound'])
     return sum(scores) / len(scores)
-
-
 
 
 def extract_probability_topics(topics):
@@ -85,8 +82,9 @@ def get_topics(documents):
     corpus = [dictionary.doc2bow(doc) for doc in filtered_tokenized_documents]
 
     # Train an LDA model
-    lda_model = LdaModel(corpus, num_topics=3, id2word=dictionary, passes=50)
+    lda_model = LdaModel(corpus, num_topics=5, id2word=dictionary, passes=50)
 
     # Print the top three topics
-    topics = lda_model.print_topics(num_topics=3, num_words=1)
-    return extract_probability_topics(topics)
+    topics = lda_model.print_topics(num_topics=5, num_words=1)
+    cleaned_values = extract_probability_topics(topics)
+    return [item['topic']for item in cleaned_values]

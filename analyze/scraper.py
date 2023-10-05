@@ -1,4 +1,5 @@
 # This is a sample Python script.
+import json
 import sys
 import time
 
@@ -12,13 +13,13 @@ from langdetect import detect
 from scrapy.crawler import CrawlerProcess
 
 
-class SiteInfo():
-    text = set()
+class SiteInfo:
+    documents = []
 
     @classmethod
-    def add_sentence(cls, field):
-        if SiteInfo.is_english(field):
-            cls.text.add(field)
+    def add_document(cls, document):
+        document_en = [line for line in document if SiteInfo.is_english(line)]
+        cls.documents.append(document_en)
 
     @staticmethod
     def is_english(sentence):
@@ -51,8 +52,10 @@ class MySpider(scrapy.Spider):
         # Extract and yield text from the current page
         page_text = response.css('p::text, div::text, span::text').getall()
         page_text = [text.strip() for text in page_text if text.strip()]
+        document = set()
         for text in page_text:
-            SiteInfo.add_sentence(text)
+            document.add(text)
+        SiteInfo.add_document(document)
 
         next_pages = response.css("a::attr(href)").getall()
         for next_page in next_pages:
@@ -72,6 +75,5 @@ if __name__ == '__main__':
 
     delimiter = ' '
 
-    with open("scrapy_dump.txt", "w") as file:
-        for item in list(SiteInfo.text):
-            file.write(item + "\n")
+    with open('scrapy_dump.json', 'w') as json_file:
+        json.dump(SiteInfo.documents, json_file)

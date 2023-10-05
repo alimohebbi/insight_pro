@@ -2,7 +2,9 @@
 venv
 html_theme_dump
 db.sqlite3
-scrapy_dump.txt
 staticfiles
 analyze/migrations
 __pycache__
+word_cloud.png
+media
+scrapy_dump.json

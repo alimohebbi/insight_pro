@@ -1,15 +1,19 @@
 # Create your views here.
 import json
 import subprocess
-from urllib.parse import urlparse, urlunparse
+from itertools import chain
+from pathlib import Path
 
+from django.conf import settings
+from django.core.files import File
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.template import loader
 
+from utils import normalize_url, url_to_filename
 from .forms import WebURLForm
-from .models import Insight
-from .nlp_tasks import get_highlights, sentiment_score
+from .models import Company, Documents
+from .nlp_tasks import get_highlights, sentiment_score, make_word_cloud, get_topics
 
 
 def index(request):
@@ -27,17 +31,20 @@ def index(request):
     return render(request, 'analyze/index.html', {'form': form})
 
 
-def results(request, website_id):
-    insight = Insight.objects.get(id=website_id)
-    top3_companies = Insight.objects.order_by('-sentiment_score')[:3]
-    top3_companies_names = [(company.website_url, round(company.sentiment_score, 3)) for company in
-                            top3_companies]
-    company_sentiment_rank = Insight.objects.filter(sentiment_score__gt=insight.sentiment_score).count() + 1
+def results(request, company_id):
+    company = Company.objects.get(id=company_id)
+    top_companies = Company.objects.order_by('-sentiment_score')[:3]
+    top_companies_names = [(company.website_url, round(company.sentiment_score, 3), company.id) for company in
+                           top_companies]
+    company_sentiment_rank = Company.objects.filter(sentiment_score__gt=company.sentiment_score).count() + 1
     template = loader.get_template("analyze/results.html")
+    number_of_companies = Company.objects.count()
+
     context = {
-        "insight": insight,
-        "top_companies": top3_companies_names,
-        'sentiment_rank': company_sentiment_rank
+        "company": company,
+        "top_companies": top_companies_names,
+        'sentiment_rank': company_sentiment_rank,
+        'total_companies': number_of_companies
     }
 
     return HttpResponse(template.render(context, request))
@@ -65,14 +72,19 @@ def get_insight(request):
 
 def get_or_create_insight(target_url):
     try:
-        insight_obj = Insight.objects.get(website_url=target_url)
-    except Insight.DoesNotExist:
-        scrap_website(target_url)
-        insight = analyze_info()
-        insight_obj = Insight(website_url=target_url, sentiment_score=insight['score'],
-                              highlights=insight['highlights'])
-        insight_obj.save()
-    return insight_obj.id
+        company = Company.objects.get(website_url=target_url)
+    except Company.DoesNotExist:
+        # scrap_website(target_url)
+        insight = analyze_info(target_url)
+
+        company = Company(website_url=target_url, sentiment_score=insight['score'],
+                          highlights=insight['highlights'], topics=insight['topics'])
+        with Path(insight['image_address']).open(mode="rb") as f:
+            company.word_cloud = File(f, name=Path(insight['image_address']).name)
+            company.save()
+        documents = Documents(scrapped_documents=insight['documents'], company = company)
+        documents.save()
+    return company.id
 
 
 def scrap_website(target_url) -> None:
@@ -81,30 +93,21 @@ def scrap_website(target_url) -> None:
         stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
 
 
-def analyze_info() -> dict:
-    lines = []
+def analyze_info(target_url) -> dict:
     delimiter = '.\r'
-    with open("scrapy_dump.txt", "r") as file:
-        for line in file:
-            lines.append(line.strip())
+    with open('scrapy_dump.json', 'r') as json_file:
+        documents = json.load(json_file)
+    lines = list(chain(*documents))
 
     full_text = delimiter.join(lines)
 
+    word_cloud = make_word_cloud(full_text)
+    image_address = 'word_cloud.png'
+    word_cloud.to_file(image_address)
     highlights = get_highlights(text=full_text)
     score = sentiment_score(lines)
+    document_for_topics = [" ".join(sentences) for sentences in documents]
+    topics = get_topics(document_for_topics)
 
-    return {'score': score, 'highlights': highlights}
-
-
-
-def normalize_url(url):
-    parsed_url = urlparse(url)
-
-    if not parsed_url.scheme or parsed_url.scheme not in ('http', 'https'):
-        scheme = 'https'
-    else:
-        scheme = parsed_url.scheme
-    normalized_url = urlunparse((scheme, parsed_url.netloc, parsed_url.path,
-                                 parsed_url.params, parsed_url.query, parsed_url.fragment))
-    return str(normalized_url).replace('www.','')
-
+    return {'score': score, 'highlights': highlights, 'image_address': image_address, 'topics': topics,
+            'documents': documents}

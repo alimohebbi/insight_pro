@@ -2,6 +2,6 @@ from django.contrib import admin
 
 # Register your models here.
 
-from .models import Insight
+from .models import Company
 
-admin.site.register(Insight)
+admin.site.register(Company)

@@ -37,7 +37,7 @@
         })
             .then(response => response.json())  // Assuming the response is JSON
             .then(data => {
-                href = '{% url 'analyze:results' website_id='x'%}'
+                href = '{% url 'analyze:results' company_id='x'%}'
                 {#document.getElementById("result_href").href = href.replace('x', data.insight_id);#}
                 document.getElementById("result_btn").href = href.replace('x', data.insight_id);
                 document.getElementById("result_btn").style.display = "block";
