@@ -1,0 +1,13 @@
+
+{% extends "analyze/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block main_content %}
+<form method="post">
+    {% csrf_token %}
+   <div class="col-6">{{ form|crispy }}
+    <button type="submit" class="btn btn-primary">Submit</button>
+   </div>
+</form>
+
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends "analyze/base.html" %}
+
+{% block main_content %}
+    {% csrf_token %}
+
+    <div class="col-6">
+        <div class="card mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Analyze in progress</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-1 small">We are gathering insights ...</div>
+                <div class="progress mb-4">
+                    <div id="progress_bar" class="progress-bar" role="progressbar" style="width: 1%"
+                         aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <a class="btn btn-primary" id="result_btn" style="display: none">
+                    Go to Results Page
+                </a>
+
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // Create a data object to send in the request body
+        const target_url = "{{ target_url }}";
+        // Send an AJAX POST request to your Django view
+        fetch("{% url 'analyze:get_insight' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            body: JSON.stringify({'target_url': target_url}), // Convert the data object to JSON
+        })
+            .then(response => response.json())  // Assuming the response is JSON
+            .then(data => {
+                href = '{% url 'analyze:results' website_id='x'%}'
+                {#document.getElementById("result_href").href = href.replace('x', data.insight_id);#}
+                document.getElementById("result_btn").href = href.replace('x', data.insight_id);
+                document.getElementById("result_btn").style.display = "block";
+                document.getElementById("progress_bar").style.width = '100%';
+            })
+            .catch(error => {
+            });
+
+        // Function to get the CSRF token from the cookie
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        function increaseProgress() {
+            let counterElement = document.getElementById("progress_bar");
+            let percentageString = counterElement.style.width
+            let currentValue = parseFloat(percentageString.replace('%', ''));
+            console.log(currentValue)
+            if (currentValue < 100) {
+                // Increase the value and update the element
+                currentValue += 0.2;
+                counterElement.style.width = currentValue + '%';
+            } else {
+                // Stop the interval when the value reaches 100
+                clearInterval(interval);
+            }
+        }
+
+        // Call the increaseValue function every 1 second
+        const interval = setInterval(increaseProgress, 100);
+
+        // Stop the interval after 100 seconds (to match your requirement)
+        setTimeout(function () {
+            clearInterval(interval);
+        }, 100000);
+        {#    while loop with delay#}
+        {#    while loop increases progress bar#}
+        {# progress bar should last 60 sec#}
+        {# if loading is finished progress should be 100#}
+
+    </script>
+{% endblock %}

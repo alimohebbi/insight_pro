@@ -1,0 +1,123 @@
+{% extends "analyze/base.html" %}
+
+{% block main_content %}
+
+
+    {% if insight %}
+
+        <!-- Page Heading -->
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-0 text-gray-800">Insights</h1>
+
+        </div>
+
+        <div class="row">
+
+            <!-- Earnings (Monthly) Card Example -->
+            <div class="col-xl-4 col-md-6 mb-4">
+                <div class="card border-left-primary shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                    Website
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ insight.website_url }}</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-building fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-4 col-md-6 mb-4">
+                <div class="card border-left-success shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                    Sentiment Score
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ insight.sentiment_score|floatformat:"3" }}   </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas  fa-heartbeat fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-4 col-md-6 mb-4">
+                <div class="card border-left-warning shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                    Sentiment Ranking
+                                </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ sentiment_rank }}</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-trophy fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Illustrations -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Highlights of the company:</h6>
+            </div>
+            <div class="card-body">
+                <ul>
+                    {% for highlight in insight.highlights %}
+                        <li>{{ highlight }}</li>
+                    {% endfor %}
+
+                </ul>
+            </div>
+        </div>
+
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Top Sentiment Companies</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive col-8">
+                    <table class="table table table-hover" width="100%" cellspacing="0">
+                        <thead>
+                        <tr>
+                            <th>URL</th>
+                            <th>Score</th>
+
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        {% for obj in top_companies %}
+                            <tr>
+                                <td><a href="{{ obj.0 }}">{{ obj.0 }}</a></td>
+                                <td>{{ obj.1 }}</td>
+                            </tr>
+                        {% endfor %}
+
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+    {% else %}
+        <p>No insights are available.</p>
+    {% endif %}
+{% endblock %}
+
