@@ -57,7 +57,9 @@
                                 <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                     Sentiment Ranking
                                 </div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ sentiment_rank }} out of {{ total_companies }} companies </div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ sentiment_rank }} out
+                                    of {{ total_companies }} companies
+                                </div>
                             </div>
                             <div class="col-auto">
                                 <i class="fas fa-trophy fa-2x text-gray-300"></i>
@@ -85,9 +87,26 @@
                     {% endfor %}
 
                 </ul>
+
+
             </div>
         </div>
 
+        <div class="card mb-4 py-3 border-left-primary">
+
+            <div class="card-body">
+                Domain of expertise:
+                <span>
+
+                            {% for domains in company.domains %}
+
+                                <span class="badge badge-primary ml-2 text-lg">{{ domains|title }}</span>
+
+                            {% endfor %}
+                            </span>
+
+            </div>
+        </div>
 
 
 
@@ -112,7 +131,8 @@
                             <tr>
                                 <td><a href="{{ obj.0 }}">{{ obj.0 }}</a></td>
                                 <td>{{ obj.1 }}</td>
-                                <td><a href="{% url 'analyze:results' company_id=obj.2 %}", class="btn btn-primary"> View Results </a></td>
+                                <td><a href="{% url 'analyze:results' company_id=obj.2 %}" , class="btn btn-primary">
+                                    View Results </a></td>
                             </tr>
                         {% endfor %}
 

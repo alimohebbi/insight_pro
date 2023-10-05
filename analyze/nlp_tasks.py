@@ -1,3 +1,4 @@
+import json
 from collections import Counter
 
 import matplotlib.pyplot as plt
@@ -13,9 +14,12 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 
+from analyze.preprocessor import pre_process
+
 nltk.download('vader_lexicon')
 nltk.download('stopwords')
 nltk.download('punkt')
+import pandas as pd
 
 
 def get_highlights(text):
@@ -46,13 +50,31 @@ def sentiment_score(lines):
 def extract_probability_topics(topics):
     cleaned_values = []
     for topic in topics:
-        probability = float(topic[1].split('*')[0])
-        name = topic[1].split('*')[1][1:-1]
+        probability = float(topic.split('*')[0])
+        name = topic.split('*')[1][1:-1].replace("\"", '')
         cleaned_values.append({'p': probability, 'topic': name})
     return cleaned_values
 
 
-def get_topics(documents):
+def get_keywords(topics_prob):
+    keyword_prob = []
+    for i in topics_prob:
+        topics_prob_list = i[1].split('+')
+
+        cleaned_topic_prob = extract_probability_topics(topics_prob_list)
+        keyword_prob.extend(cleaned_topic_prob)
+    keyword_prob.sort(key=lambda x: x['p'], reverse=True)
+    keywords = [item['topic'] for item in keyword_prob]
+    return keywords
+
+
+def clean_keywords(keywords):
+    df = pd.DataFrame(keywords, columns=['keywords'])
+    pre_processed_s = pre_process(df)
+    return list(pre_processed_s['keywords'])
+
+
+def get_keywords_domain(documents):
     # Tokenize and preprocess the documents
 
     stop_words = set(stopwords.words('english'))
@@ -68,7 +90,7 @@ def get_topics(documents):
     # Calculate the number of words to remove (top 1%)
     num_words_to_remove = int(0.001 * len(word_frequencies))
 
-    # Identify the top 10% most frequent words to remove
+    # Identify the top 0.1% most frequent words to remove
     words_to_remove = [word for word, _ in word_frequencies.most_common(num_words_to_remove)]
 
     # Filter out high-frequency words from the tokenized documents
@@ -85,6 +107,8 @@ def get_topics(documents):
     lda_model = LdaModel(corpus, num_topics=5, id2word=dictionary, passes=50)
 
     # Print the top three topics
-    topics = lda_model.print_topics(num_topics=5, num_words=1)
-    cleaned_values = extract_probability_topics(topics)
-    return [item['topic']for item in cleaned_values]
+    topics_prob = lda_model.print_topics(num_topics=5, num_words=20)
+    keywords = get_keywords(topics_prob)
+    domains = list(set(keywords[:5]))
+    keywords = clean_keywords(keywords)
+    return domains, keywords
