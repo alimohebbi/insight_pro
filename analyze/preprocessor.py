@@ -13,14 +13,13 @@ else:
     ssl._create_default_https_context = _create_unverified_https_context
 
 nltk.download('stopwords')
-nltk.download('punkt')  
+nltk.download('punkt')
 nltk.download('wordnet')
 nltk.download('averaged_perceptron_tagger')
 from nltk.corpus import stopwords
 from nltk.corpus import wordnet
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
-
 
 
 def remove_punctuation(s):
@@ -57,19 +56,21 @@ def remove_unusual_char(input_str):
     return re.sub('[^A-Za-z0-9 ]+', '', input_str)
 
 
-def pre_process(data):
+def pre_process(data, for_storage=True):
     processing_data = data.map(lambda s: s.lower())
-    processing_data = processing_data.map(lambda s: re.sub(r'\d+', '', s))
+    if for_storage:
+        processing_data = processing_data.map(lambda s: re.sub(r'\d+', '', s))
     processing_data = processing_data.map(lambda s: remove_punctuation(s))
     processing_data = processing_data.map(lambda s: s.strip())
     processing_data = processing_data.map(lambda s: ' '.join(s.split()))
     processing_data = processing_data.map(lambda s: remove_stop_words(s))
     processing_data = processing_data.map(lambda s: remove_unusual_char(s))
-    processing_data = processing_data.map(lambda s: lemmatizing(s))
+    if for_storage:
+        processing_data = processing_data.map(lambda s: lemmatizing(s))
     return processing_data
 
 
-def clean_text_list(text_list):
+def clean_text_list(text_list, for_storage=True):
     df = pd.DataFrame(text_list, columns=['text'])
-    pre_processed_s = pre_process(df)
+    pre_processed_s = pre_process(df, for_storage)
     return list(pre_processed_s['text'])

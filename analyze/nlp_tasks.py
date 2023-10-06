@@ -1,30 +1,31 @@
-import json
 from collections import Counter
 
 import matplotlib.pyplot as plt
 import nltk
+from gensim import corpora
+from gensim.models import LdaModel
+from nltk.corpus import stopwords
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
+from nltk.tokenize import word_tokenize
+from sumy.nlp.stemmers import Stemmer
 from sumy.nlp.tokenizers import Tokenizer
 from sumy.parsers.plaintext import PlaintextParser
 from sumy.summarizers.lsa import LsaSummarizer
+from sumy.utils import get_stop_words
 from wordcloud import WordCloud
-from gensim import corpora
-from gensim.models import LdaModel
-import nltk
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
 
-from analyze.preprocessor import pre_process, clean_text_list
+from analyze.preprocessor import clean_text_list
 
 nltk.download('vader_lexicon')
 nltk.download('stopwords')
 nltk.download('punkt')
-import pandas as pd
 
 
 def get_highlights(text):
     parser = PlaintextParser.from_string(text, Tokenizer("english"))
-    summarizer = LsaSummarizer()
+    stemmer = Stemmer('english')
+    summarizer = LsaSummarizer(stemmer)
+    summarizer.stop_words = get_stop_words('english')
     summary = summarizer(parser.document, sentences_count=5)
     return [str(sentence) for sentence in summary]
 

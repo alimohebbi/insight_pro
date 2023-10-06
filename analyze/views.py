@@ -14,6 +14,7 @@ from utils import normalize_url, url_to_filename, sample_list
 from .forms import WebURLForm
 from .models import Company
 from .nlp_tasks import get_highlights, sentiment_score, make_word_cloud, get_keywords_domain
+from .preprocessor import clean_text_list
 from .recommender import find_similar_companies, Recommender
 
 
@@ -119,23 +120,34 @@ def scrap_website(target_url) -> None:
 
 
 def analyze_info(target_url) -> dict:
-    delimiter = '.\r'
     with open('scrapy_dump.json', 'r') as json_file:
         documents = json.load(json_file)
     lines = list(chain(*documents))
+    # lines = list(set(chain(*documents)))
 
-    sampled_lines = sample_list(lines, 0.1)
-    full_text = delimiter.join(sampled_lines)
-    highlights = get_highlights(text=full_text)
+    score = sentiment_score(lines)
+
+    full_text = concat_lines(lines)
+    highlights = list(set(get_highlights(text=full_text)))
+
+    document_for_topics = [" ".join(sentences) for sentences in documents]
+    document_for_topics = clean_text_list(document_for_topics)
+    full_text = concat_lines(document_for_topics)
 
     word_cloud = make_word_cloud(full_text)
     image_address = 'word_cloud.png'
     word_cloud.to_file(image_address)
 
-    score = sentiment_score(sampled_lines)
-
-    document_for_topics = [" ".join(sentences) for sentences in documents]
     domains, keywords = get_keywords_domain(document_for_topics)
 
     return {'score': score, 'highlights': highlights, 'image_address': image_address, 'domains': domains,
             'keywords': keywords, 'doc_address': 'scrapy_dump.json'}
+
+
+def concat_lines(lines):
+    full_text = ''
+    for line in lines:
+        if len(line) > 1 and line[- 1] != '.':
+            line += '.'
+        full_text += ' ' + line
+    return full_text

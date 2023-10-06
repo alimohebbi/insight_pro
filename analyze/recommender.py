@@ -19,6 +19,8 @@ class Recommender:
 
     @classmethod
     def build_tfidf_matrix(cls):
+        if Company.objects.count() == 0:
+            return
         companies = Company.objects.all()
         companies_keywords_list = [' '.join(company.keywords) for company in companies]
         cls.companies_ids = [company.id for company in companies]
