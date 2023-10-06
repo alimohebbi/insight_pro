@@ -16,6 +16,7 @@ def url_to_filename(url):
 
     return safe_filename
 
+
 def normalize_url(url):
     parsed_url = urlparse(url)
 
@@ -26,3 +27,12 @@ def normalize_url(url):
     normalized_url = urlunparse((scheme, parsed_url.netloc, parsed_url.path,
                                  parsed_url.params, parsed_url.query, parsed_url.fragment))
     return str(normalized_url).replace('www.', '')
+
+
+def sample_list(original_list, rate):
+    import random
+
+    # Calculate the number of elements to sample (10% of the list)
+    sample_size = int(len(original_list) * rate)
+
+    return random.sample(original_list, sample_size)

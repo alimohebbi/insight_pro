@@ -10,11 +10,11 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.template import loader
 
-from utils import normalize_url, url_to_filename
+from utils import normalize_url, url_to_filename, sample_list
 from .forms import WebURLForm
 from .models import Company
 from .nlp_tasks import get_highlights, sentiment_score, make_word_cloud, get_keywords_domain
-from .recommender import find_similar_companies
+from .recommender import find_similar_companies, Recommender
 
 
 def index(request):
@@ -37,7 +37,6 @@ def results(request, company_id):
     similar_companies = find_similar_companies(company)
     top_companies_names = [(company.website_url, round(company.sentiment_score, 3), company.id) for company in
                            similar_companies]
-    # top_companies_names = top_sentiment_companies()
     company_sentiment_rank = Company.objects.filter(sentiment_score__gt=company.sentiment_score).count() + 1
     template = loader.get_template("analyze/results.html")
     number_of_companies = Company.objects.count()
@@ -53,7 +52,6 @@ def results(request, company_id):
 
 
 def leaderboard(request):
-
     top_companies_names = top_sentiment_companies()
     template = loader.get_template("analyze/leader_board.html")
 
@@ -110,6 +108,7 @@ def create_company(insight, target_url):
     with Path(insight['doc_address']).open(mode="rb") as f:
         company.scrapped_documents = File(f, name=Path(insight['doc_address']).name)
         company.save()
+    Recommender.update_tfidf_matrix()
     return company
 
 
@@ -125,13 +124,16 @@ def analyze_info(target_url) -> dict:
         documents = json.load(json_file)
     lines = list(chain(*documents))
 
-    full_text = delimiter.join(lines)
+    sampled_lines = sample_list(lines, 0.1)
+    full_text = delimiter.join(sampled_lines)
+    highlights = get_highlights(text=full_text)
 
     word_cloud = make_word_cloud(full_text)
     image_address = 'word_cloud.png'
     word_cloud.to_file(image_address)
-    highlights = get_highlights(text=full_text)
-    score = sentiment_score(lines)
+
+    score = sentiment_score(sampled_lines)
+
     document_for_topics = [" ".join(sentences) for sentences in documents]
     domains, keywords = get_keywords_domain(document_for_topics)
 
