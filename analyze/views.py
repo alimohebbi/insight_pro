@@ -122,16 +122,17 @@ def scrap_website(target_url) -> None:
 def analyze_info(target_url) -> dict:
     with open('scrapy_dump.json', 'r') as json_file:
         documents = json.load(json_file)
+
     lines = list(chain(*documents))
-    # lines = list(set(chain(*documents)))
+    full_text = concat_lines(lines)
+    lines = list(set(get_highlights(text=full_text, sentences_count=int(len(lines) / 2))))
+    full_text = concat_lines(lines)
 
     score = sentiment_score(lines)
 
-    full_text = concat_lines(lines)
-    highlights = list(set(get_highlights(text=full_text)))
+    highlights = list(set(get_highlights(text=full_text, sentences_count=5)))
 
-    document_for_topics = [" ".join(sentences) for sentences in documents]
-    document_for_topics = clean_text_list(document_for_topics)
+    document_for_topics = clean_text_list(lines)
     full_text = concat_lines(document_for_topics)
 
     word_cloud = make_word_cloud(full_text)

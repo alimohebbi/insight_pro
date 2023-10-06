@@ -21,12 +21,12 @@ nltk.download('stopwords')
 nltk.download('punkt')
 
 
-def get_highlights(text):
+def get_highlights(text, sentences_count):
     parser = PlaintextParser.from_string(text, Tokenizer("english"))
     stemmer = Stemmer('english')
     summarizer = LsaSummarizer(stemmer)
     summarizer.stop_words = get_stop_words('english')
-    summary = summarizer(parser.document, sentences_count=5)
+    summary = summarizer(parser.document, sentences_count=sentences_count)
     return [str(sentence) for sentence in summary]
 
 
