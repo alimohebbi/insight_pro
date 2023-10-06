@@ -3,6 +3,7 @@ import ssl
 import string
 
 import nltk
+import pandas as pd
 
 try:
     _create_unverified_https_context = ssl._create_unverified_context
@@ -67,3 +68,8 @@ def pre_process(data):
     processing_data = processing_data.map(lambda s: lemmatizing(s))
     return processing_data
 
+
+def clean_text_list(text_list):
+    df = pd.DataFrame(text_list, columns=['text'])
+    pre_processed_s = pre_process(df)
+    return list(pre_processed_s['text'])

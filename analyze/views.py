@@ -14,6 +14,7 @@ from utils import normalize_url, url_to_filename
 from .forms import WebURLForm
 from .models import Company
 from .nlp_tasks import get_highlights, sentiment_score, make_word_cloud, get_keywords_domain
+from .recommender import find_similar_companies
 
 
 def index(request):
@@ -33,9 +34,10 @@ def index(request):
 
 def results(request, company_id):
     company = Company.objects.get(id=company_id)
-    top_companies = Company.objects.order_by('-sentiment_score')[:3]
+    similar_companies = find_similar_companies(company)
     top_companies_names = [(company.website_url, round(company.sentiment_score, 3), company.id) for company in
-                           top_companies]
+                           similar_companies]
+    # top_companies_names = top_sentiment_companies()
     company_sentiment_rank = Company.objects.filter(sentiment_score__gt=company.sentiment_score).count() + 1
     template = loader.get_template("analyze/results.html")
     number_of_companies = Company.objects.count()
@@ -48,6 +50,25 @@ def results(request, company_id):
     }
 
     return HttpResponse(template.render(context, request))
+
+
+def leaderboard(request):
+
+    top_companies_names = top_sentiment_companies()
+    template = loader.get_template("analyze/leader_board.html")
+
+    context = {
+        "top_companies": top_companies_names,
+    }
+
+    return HttpResponse(template.render(context, request))
+
+
+def top_sentiment_companies():
+    top_companies = Company.objects.order_by('-sentiment_score')[:10]
+    top_companies_names = [(company.website_url, round(company.sentiment_score, 3), company.id) for company in
+                           top_companies]
+    return top_companies_names
 
 
 def progress(request):
@@ -74,7 +95,7 @@ def get_or_create_company(target_url):
     try:
         company = Company.objects.get(website_url=target_url)
     except Company.DoesNotExist:
-        # scrap_website(target_url)
+        scrap_website(target_url)
         insight = analyze_info(target_url)
         company = create_company(insight, target_url)
     return company.id

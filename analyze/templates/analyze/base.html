@@ -46,14 +46,19 @@
         <!-- Nav Item - Dashboard -->
         <li class="nav-item">
             <a class="nav-link" href="{% url 'analyze:index' %}">
-                <i class="fas fa-fw fa-tachometer-alt"></i>
-                <span>Get Insights</span></a>
+                <i class="fas fa-fw fa-search"></i>
+                <span>Search</span></a>
         </li>
+
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'analyze:leaderboard' %}">
+                <i class="fas fa-table"></i>
+                <span>Leaderboard</span></a>
+        </li>
+
 
         <!-- Divider -->
         <hr class="sidebar-divider">
-
-
 
 
         <!-- Sidebar Toggler (Sidebar) -->
@@ -86,8 +91,8 @@
 
             <div class="container-fluid">
                 {% block main_content %}
-                <!-- Page Heading -->
-                <h1 class="h3 mb-4 text-gray-800">Blank Page</h1>
+                    <!-- Page Heading -->
+                    <h1 class="h3 mb-4 text-gray-800">Blank Page</h1>
                 {% endblock %}
             </div>
             <!-- /.container-fluid -->
@@ -144,13 +149,13 @@
 <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %} "></script>
 
 <!-- Custom scripts for all pages-->
-    <script src="{% static 'js/sb-admin-2.min.js' %}"></script>
+<script src="{% static 'js/sb-admin-2.min.js' %}"></script>
 
-    <!-- Page level custom scripts -->
-    <script src=" {% static 'vendor/datatables/jquery.dataTables.min.js' %}"></script>
-    <script src=" {% static 'vendor/datatables/dataTables.bootstrap4.min.js' %}"></script>
+<!-- Page level custom scripts -->
+<script src=" {% static 'vendor/datatables/jquery.dataTables.min.js' %}"></script>
+<script src=" {% static 'vendor/datatables/dataTables.bootstrap4.min.js' %}"></script>
 
-    <script src="{% static 'js/demo/datatables-demo.js' %}"></script>
+<script src="{% static 'js/demo/datatables-demo.js' %}"></script>
 
 
 </body>

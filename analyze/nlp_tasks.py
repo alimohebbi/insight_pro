@@ -14,7 +14,7 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 
-from analyze.preprocessor import pre_process
+from analyze.preprocessor import pre_process, clean_text_list
 
 nltk.download('vader_lexicon')
 nltk.download('stopwords')
@@ -68,12 +68,6 @@ def get_keywords(topics_prob):
     return keywords
 
 
-def clean_keywords(keywords):
-    df = pd.DataFrame(keywords, columns=['keywords'])
-    pre_processed_s = pre_process(df)
-    return list(pre_processed_s['keywords'])
-
-
 def get_keywords_domain(documents):
     # Tokenize and preprocess the documents
 
@@ -110,5 +104,5 @@ def get_keywords_domain(documents):
     topics_prob = lda_model.print_topics(num_topics=5, num_words=20)
     keywords = get_keywords(topics_prob)
     domains = list(set(keywords[:5]))
-    keywords = clean_keywords(keywords)
+    keywords = clean_text_list(keywords)
     return domains, keywords

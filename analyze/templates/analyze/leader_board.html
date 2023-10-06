@@ -1,0 +1,53 @@
+{% extends "analyze/base.html" %}
+{% block main_content %}
+
+
+    {% if top_companies %}
+
+        <!-- Page Heading -->
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-0 text-gray-800">Insights</h1>
+
+        </div>
+
+
+
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Top 10 Companies in Sentiment Score</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive ">
+                    <table class="table table table-hover" width="100%" cellspacing="0">
+                        <thead>
+                        <tr>
+                            <th>URL</th>
+                            <th>Sentiment Score</th>
+                            <th>Insights</th>
+
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        {% for obj in top_companies %}
+                            <tr>
+                                <td><a href="{{ obj.0 }}">{{ obj.0 }}</a></td>
+                                <td>{{ obj.1 }}</td>
+                                <td><a href="{% url 'analyze:results' company_id=obj.2 %}" , class="btn btn-primary">
+                                    View Results </a></td>
+                            </tr>
+                        {% endfor %}
+
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+    {% else %}
+        <p>No company is available at the moment.</p>
+    {% endif %}
+{% endblock %}
+
