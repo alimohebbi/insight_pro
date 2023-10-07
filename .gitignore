@@ -8,3 +8,4 @@ __pycache__
 word_cloud.png
 media
 scrapy_dump.json
+web_insight/secret.py
