@@ -1,4 +1,5 @@
 from collections import Counter
+from itertools import chain
 
 import matplotlib.pyplot as plt
 import nltk
@@ -70,40 +71,63 @@ def get_keywords(topics_prob):
 
 
 def get_keywords_domain(documents):
+    topics_prob = get_str_topics(documents)
+    keywords = get_keywords(topics_prob)
+    domains = list(set(keywords[:5]))
+    keywords = clean_text_list(keywords)
+    return domains, keywords
+
+
+def get_str_topics(documents):
     # Tokenize and preprocess the documents
+    filtered_tokenized_documents = get_tokenize_docs(documents)
+    # Create a dictionary and corpus for LDA
+    dictionary = corpora.Dictionary(filtered_tokenized_documents)
+    corpus = [dictionary.doc2bow(doc) for doc in filtered_tokenized_documents]
+    # Train an LDA model
+    lda_model = LdaModel(corpus, num_topics=5, id2word=dictionary, passes=50)
+    # Print the top three topics
+    topics_prob = lda_model.print_topics(num_topics=5, num_words=20)
+    return topics_prob
 
+
+def get_tokenize_docs(documents):
     stop_words = set(stopwords.words('english'))
-
     tokenized_documents = [
         [word for word in word_tokenize(doc.lower()) if word.isalnum() and word not in stop_words]
         for doc in documents
     ]
-
     # Calculate word frequencies
     word_frequencies = Counter(word for doc in tokenized_documents for word in doc)
-
-    # Calculate the number of words to remove (top 1%)
+    # Calculate the number of words to remove (top 0.1%)
     num_words_to_remove = int(0.001 * len(word_frequencies))
-
     # Identify the top 0.1% most frequent words to remove
     words_to_remove = [word for word, _ in word_frequencies.most_common(num_words_to_remove)]
-
     # Filter out high-frequency words from the tokenized documents
     filtered_tokenized_documents = [
         [word for word in doc if word not in words_to_remove]
         for doc in tokenized_documents
     ]
+    return filtered_tokenized_documents
 
-    # Create a dictionary and corpus for LDA
-    dictionary = corpora.Dictionary(filtered_tokenized_documents)
-    corpus = [dictionary.doc2bow(doc) for doc in filtered_tokenized_documents]
 
-    # Train an LDA model
-    lda_model = LdaModel(corpus, num_topics=5, id2word=dictionary, passes=50)
+def concat_lines(lines):
+    full_text = ''
+    for line in lines:
+        if len(line) > 1 and line[- 1] != '.':
+            line += '.'
+        full_text += ' ' + line
+    return full_text
 
-    # Print the top three topics
-    topics_prob = lda_model.print_topics(num_topics=5, num_words=20)
-    keywords = get_keywords(topics_prob)
-    domains = list(set(keywords[:5]))
-    keywords = clean_text_list(keywords)
-    return domains, keywords
+
+class DocumentsPreProcessor:
+
+    def __init__(self, documents):
+        flat_lines_documents = list(chain(*documents))
+        full_text = concat_lines(flat_lines_documents)
+        sentences_for_consideration = int(len(flat_lines_documents) / 2)
+        important_lines = list(set(get_highlights(text=full_text, sentences_count=sentences_for_consideration)))
+        self.sentiment_analysis_input = important_lines
+        self.highlights_input = ' '.join(important_lines)
+        self.topic_modeling_input = clean_text_list(important_lines)
+        self.word_cloud_input = ' '.join(self.topic_modeling_input)

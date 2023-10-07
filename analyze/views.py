@@ -1,20 +1,17 @@
 # Create your views here.
 import json
+import os
 import subprocess
-from itertools import chain
-from pathlib import Path
 
 from django.conf import settings
-from django.core.files import File
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.template import loader
 
-from utils import normalize_url, url_to_filename, sample_list
+from utils import normalize_url, url_to_filename
 from .forms import WebURLForm
 from .models import Company
-from .nlp_tasks import get_highlights, sentiment_score, make_word_cloud, get_keywords_domain
-from .preprocessor import clean_text_list
+from .nlp_tasks import get_highlights, sentiment_score, make_word_cloud, get_keywords_domain, DocumentsPreProcessor
 from .recommender import find_similar_companies, Recommender
 
 
@@ -94,61 +91,53 @@ def get_or_create_company(target_url):
     try:
         company = Company.objects.get(website_url=target_url)
     except Company.DoesNotExist:
-        scrap_website(target_url)
-        insight = analyze_info(target_url)
+        site_dump_path = settings.MEDIA_ROOT + '/documents/' + url_to_filename(target_url) + '.json'
+        scrap_website(target_url, site_dump_path)
+        insight = analyze_info(target_url, site_dump_path)
         company = create_company(insight, target_url)
     return company.id
 
 
 def create_company(insight, target_url):
-    company = Company(website_url=target_url, sentiment_score=insight['score'], highlights=insight['highlights'],
-                      domains=insight['domains'], keywords=insight['keywords'])
-    with Path(insight['image_address']).open(mode="rb") as f:
-        company.word_cloud = File(f, name=Path(insight['image_address']).name)
-        company.save()
-    with Path(insight['doc_address']).open(mode="rb") as f:
-        company.scrapped_documents = File(f, name=Path(insight['doc_address']).name)
-        company.save()
+    company = Company()
+    company.website_url = target_url
+    company.sentiment_score = insight['score']
+    company.highlights = insight['highlights']
+    company.domains = insight['domains']
+    company.keywords = insight['keywords']
+    company.word_cloud = insight['word_cloud_path']
+    company.scrapped_documents = insight['site_dump_path']
+    company.save()
     Recommender.update_tfidf_matrix()
     return company
 
 
-def scrap_website(target_url) -> None:
+def scrap_website(target_url, save_to) -> None:
+    venv_python = os.path.join(settings.BASE_DIR, 'venv/bin/python')
     result = subprocess.run(
-        ["/Users/usiusi/Documents/Repositories/web_insight/venv/bin/python", "analyze/scraper.py", target_url],
+        [venv_python, "analyze/scraper.py", target_url, save_to],
         stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
 
 
-def analyze_info(target_url) -> dict:
-    with open('scrapy_dump.json', 'r') as json_file:
+def analyze_info(target_url, site_dump_path) -> dict:
+    with open(site_dump_path, 'r') as json_file:
         documents = json.load(json_file)
+    preprocessor = DocumentsPreProcessor(documents)
 
-    lines = list(chain(*documents))
-    full_text = concat_lines(lines)
-    lines = list(set(get_highlights(text=full_text, sentences_count=int(len(lines) / 2))))
-    full_text = concat_lines(lines)
+    score = sentiment_score(preprocessor.sentiment_analysis_input)
+    highlights = list(set(get_highlights(text=preprocessor.highlights_input, sentences_count=5)))
 
-    score = sentiment_score(lines)
+    word_cloud = make_word_cloud(preprocessor.word_cloud_input)
+    image_path = settings.MEDIA_ROOT + '/word_clouds/' + url_to_filename(target_url) + '.png'
+    word_cloud.to_file(image_path)
 
-    highlights = list(set(get_highlights(text=full_text, sentences_count=5)))
+    domains, keywords = get_keywords_domain(preprocessor.topic_modeling_input)
 
-    document_for_topics = clean_text_list(lines)
-    full_text = concat_lines(document_for_topics)
-
-    word_cloud = make_word_cloud(full_text)
-    image_address = 'word_cloud.png'
-    word_cloud.to_file(image_address)
-
-    domains, keywords = get_keywords_domain(document_for_topics)
-
-    return {'score': score, 'highlights': highlights, 'image_address': image_address, 'domains': domains,
-            'keywords': keywords, 'doc_address': 'scrapy_dump.json'}
-
-
-def concat_lines(lines):
-    full_text = ''
-    for line in lines:
-        if len(line) > 1 and line[- 1] != '.':
-            line += '.'
-        full_text += ' ' + line
-    return full_text
+    image_url = 'word_clouds/' + url_to_filename(target_url) + '.png'
+    dump_url = 'documents/' + url_to_filename(target_url) + '.json'
+    return {'score': score,
+            'highlights': highlights,
+            'domains': domains,
+            'keywords': keywords,
+            'word_cloud_path': image_url,
+            'site_dump_path': dump_url}

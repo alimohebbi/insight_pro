@@ -15,6 +15,7 @@ from scrapy.crawler import CrawlerProcess
 
 class SiteInfo:
     documents = []
+    line_count = 0
 
     @classmethod
     def add_document(cls, document):
@@ -36,6 +37,7 @@ class MySpider(scrapy.Spider):
         "DEPTH_LIMIT": 1
     }
     max_crawl_time = 30
+    max_line_count = 1500
 
     # Maximum depth for crawling
 
@@ -48,12 +50,16 @@ class MySpider(scrapy.Spider):
         if elapsed_time > self.max_crawl_time:
             self.logger.warning(f"Time limit ({self.max_crawl_time} seconds) reached. Stopping crawling.")
             raise scrapy.exceptions.CloseSpider('Time limit reached')
+        if SiteInfo.line_count > self.max_line_count:
+            self.logger.warning(f"Line limit ({self.max_line_count}) reached. Stopping crawling.")
+            raise scrapy.exceptions.CloseSpider('Time limit reached')
 
         # Extract and yield text from the current page
         page_text = response.css('p::text, div::text, span::text').getall()
         page_text = [text.strip() for text in page_text if text.strip()]
         document = set()
         for text in page_text:
+            SiteInfo.line_count += 1
             document.add(text)
         SiteInfo.add_document(document)
 
@@ -69,11 +75,12 @@ class MySpider(scrapy.Spider):
 
 if __name__ == '__main__':
     start_url = sys.argv[1]
+    save_to = sys.argv[2]
     process = CrawlerProcess()
     process.crawl(MySpider, start_urls=[start_url])
     process.start()
 
     delimiter = ' '
 
-    with open('scrapy_dump.json', 'w') as json_file:
+    with open(save_to, 'w') as json_file:
         json.dump(SiteInfo.documents, json_file)
