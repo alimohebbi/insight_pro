@@ -9,6 +9,7 @@ from django.shortcuts import render
 from django.template import loader
 
 from utils import normalize_url, url_to_filename
+from web_insight.settings import BASE_DIR
 from .forms import WebURLForm
 from .models import Company
 from .nlp_tasks import get_highlights, sentiment_score, make_word_cloud, get_keywords_domain, DocumentsPreProcessor, \
@@ -22,7 +23,7 @@ def index(request):
         if form.is_valid():
             target_url = normalize_url(form.cleaned_data['target_url'])
             request.session['target_url'] = target_url
-            return HttpResponseRedirect(f'/analyze/progress/')
+            return HttpResponseRedirect('/analyze/progress/')
 
         else:
             return render(request, 'analyze/index.html', {'form': form})
@@ -45,7 +46,7 @@ def results(request, company_id):
         "top_companies": top_companies_names,
         'sentiment_rank': company_sentiment_rank,
         'total_companies': number_of_companies,
-        'semantic_score_inter':semantic_score_inter
+        'semantic_score_inter': semantic_score_inter
     }
 
     return HttpResponse(template.render(context, request))
@@ -60,8 +61,6 @@ def leaderboard(request):
     }
 
     return HttpResponse(template.render(context, request))
-
-
 
 
 def progress(request):
@@ -119,9 +118,9 @@ def top_sentiment_companies():
 
 
 def scrap_website(target_url, save_to) -> None:
-    venv_python = os.path.join(settings.VENV_PATH, 'bin/python')
+
     result = subprocess.run(
-        [venv_python, "analyze/scraper.py", target_url, save_to],
+        [settings.PYTHON_PATH, settings.SCRAPER_PATH, target_url, save_to],
         stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     with open(save_to, 'r') as json_file:
         documents = json.load(json_file)
