@@ -27,7 +27,7 @@ SECRET_KEY = KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['alimhbb.pythonanywhere.com','127.0.0.1']
+ALLOWED_HOSTS = ['alimhbb.pythonanywhere.com','127.0.0.1','www.insight-pro.info']
 
 # Application definition
 
