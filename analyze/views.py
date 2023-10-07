@@ -11,7 +11,8 @@ from django.template import loader
 from utils import normalize_url, url_to_filename
 from .forms import WebURLForm
 from .models import Company
-from .nlp_tasks import get_highlights, sentiment_score, make_word_cloud, get_keywords_domain, DocumentsPreProcessor
+from .nlp_tasks import get_highlights, sentiment_score, make_word_cloud, get_keywords_domain, DocumentsPreProcessor, \
+    interpret_semantic_score
 from .recommender import find_similar_companies, Recommender
 
 
@@ -38,12 +39,13 @@ def results(request, company_id):
     company_sentiment_rank = Company.objects.filter(sentiment_score__gt=company.sentiment_score).count() + 1
     template = loader.get_template("analyze/results.html")
     number_of_companies = Company.objects.count()
-
+    semantic_score_inter = interpret_semantic_score(company.sentiment_score)
     context = {
         "company": company,
         "top_companies": top_companies_names,
         'sentiment_rank': company_sentiment_rank,
-        'total_companies': number_of_companies
+        'total_companies': number_of_companies,
+        'semantic_score_inter':semantic_score_inter
     }
 
     return HttpResponse(template.render(context, request))

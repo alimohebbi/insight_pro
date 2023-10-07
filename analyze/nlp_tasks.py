@@ -120,6 +120,47 @@ def concat_lines(lines):
     return full_text
 
 
+def interpret_semantic_score(score):
+    interpretation = {'level': '', 'characteristics': []}
+    if score > 0.25:
+        interpretation['level'] = 'Highly Positive'
+        interpretation['characteristics'] = [
+            'Innovation-Oriented: Statements in this category often reflect a company culture that encourages and values '
+            'innovation and creative thinking.',
+            'Customer-Centric: Companies with highly positive sentiment scores prioritize exceptional customer service '
+            'and satisfaction.',
+            'High Morale: A culture with high morale typically has motivated and engaged employees who enjoy their work'
+            ' and feel a sense of purpose.']
+    elif score > 0.1:
+        interpretation['level'] = 'Positive'
+        interpretation['characteristics'] = [
+            'Collaborative Environment: Companies falling in this range often promote teamwork and collaboration among'
+            ' employees.',
+            'Ethical Practices: A positive or neutral sentiment score suggests a commitment to ethical and responsible'
+            ' business practices.',
+            'Decent Work-Life Balance: Employees may enjoy a reasonable work-life balance, which can contribute to '
+            'their overall job satisfaction.']
+    elif score > 0:
+        interpretation['level'] = 'Neutral'
+        interpretation['characteristics'] = [
+            ' Standard Practices: Companies with neutral sentiment scores typically follow industry-standard practices'
+            ' without major deviations.',
+            'Steady Performance: This category might reflect a stable and consistent company culture without extreme'
+            ' highs or lows.',
+            'Average Employee Satisfaction: The sentiment score in this range may indicate a culture where employees'
+            ' are generally content but not overly enthusiastic.']
+    else:
+        interpretation['level'] = 'Negative'
+        interpretation['characteristics'] = [
+            'Challenging Work Environment: Negative sentiment often points to a culture with significant challenges '
+            'or obstacles that employees face.',
+            'Communication Issues: Companies in this category may struggle with internal and external communication, '
+            'which can lead to misunderstandings.',
+            'Reduced Employee Engagement: Negative sentiment scores could signify a culture where employees are '
+            'demotivated, leading to lower job satisfaction.']
+    return interpretation
+
+
 class DocumentsPreProcessor:
 
     def __init__(self, documents):

@@ -37,7 +37,7 @@ class MySpider(scrapy.Spider):
         "DEPTH_LIMIT": 1
     }
     max_crawl_time = 30
-    max_line_count = 1500
+    max_line_count = 2000
 
     # Maximum depth for crawling
 

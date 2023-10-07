@@ -81,7 +81,8 @@
                     <img class="img-fluid px-3 px-sm-4 mt-3 mb-4" style="width: 40rem;"
                          src="{{ company.word_cloud.url }}" alt="...">
                 </div>
-                <ul>
+                <div class="m-1">Here are the most noticeable statements in the website:</div>
+                <ul class="m-1">
                     {% for highlight in company.highlights %}
                         <li>{{ highlight }}</li>
                     {% endfor %}
@@ -108,8 +109,21 @@
             </div>
         </div>
 
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Semantic Score Interpretation</h6>
+            </div>
+            <div class="card-body">
+                Sentiment score of the company is "{{ semantic_score_inter.level }}", which constitute following
+                attributes:
+                <ul class="m-1">
+                    {% for character in semantic_score_inter.characteristics %}
+                        <li>{{ character }}</li>
+                    {% endfor %}
 
-
+                </ul>
+            </div>
+        </div>
         <div class="card shadow mb-4">
             <div class="card-header py-3">
                 <h6 class="m-0 font-weight-bold text-primary">Similar Companies</h6>
@@ -131,7 +145,7 @@
                             <tr>
                                 <td><a href="{{ obj.0 }}">{{ obj.0 }}</a></td>
                                 <td>{{ obj.1 }}</td>
-                                <td><a href="{% url 'analyze:results' company_id=obj.2 %}" , class="btn btn-primary">
+                                <td><a href="{% url 'analyze:results' company_id=obj.2 %}" class="btn btn-primary">
                                     View Results </a></td>
                             </tr>
                         {% endfor %}

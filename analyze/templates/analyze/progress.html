@@ -14,16 +14,20 @@
                     <div id="progress_bar" class="progress-bar" role="progressbar" style="width: 1%"
                          aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
-                <a class="btn btn-primary" id="result_btn" style="display: none">
-                    Go to Results Page
-                </a>
+                <div>
+                    <a type="button" class="btn btn-primary" id="result_btn" style="display: none">
+                        Go to Results Page
+                    </a><div></div>
+                </div>
 
             </div>
 
             <div id="error_card" class="card-body" style="display: none">
-                <div class="mb-1 small">Sorry, the website address is invalid or do not allow robots.</div>
+                <div class="alert alert-danger" role="alert">Sorry, the address is invalid or the website do not allow
+                    robots.
+                </div>
 
-                <a class="btn btn-danger" href="{% url 'analyze:index' %}">
+                <a class="btn btn-primary" href="{% url 'analyze:index' %}">
                     Go to Search Page
                 </a>
 
@@ -55,7 +59,7 @@
                 href = '{% url 'analyze:results' company_id='x'%}'
                 {#document.getElementById("result_href").href = href.replace('x', data.insight_id);#}
                 document.getElementById("result_btn").href = href.replace('x', data.company_id);
-                document.getElementById("result_btn").style.display = "block";
+                document.getElementById("result_btn").style.display = "inline   ";
                 document.getElementById("progress_bar").style.width = '100%';
                 console.log(data)
             })
