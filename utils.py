@@ -20,7 +20,7 @@ def url_to_filename(url):
 def normalize_url(url):
     parsed_url = urlparse(url)
 
-    if not parsed_url.scheme or parsed_url.scheme != 'https':
+    if not parsed_url.scheme or parsed_url.scheme is not 'https':
         scheme = 'https'
     else:
         scheme = parsed_url.scheme

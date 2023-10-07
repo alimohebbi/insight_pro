@@ -6,6 +6,7 @@ staticfiles
 analyze/migrations
 __pycache__
 word_cloud.png
-media
+media/documents/*.json
+media/word_clouds/*.png
 scrapy_dump.json
 web_insight/secret.py
