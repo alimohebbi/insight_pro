@@ -91,7 +91,7 @@ def get_or_create_company(target_url):
         company = Company.objects.get(website_url=target_url)
     except Company.DoesNotExist:
         site_dump_path = settings.MEDIA_ROOT + '/documents/' + url_to_filename(target_url) + '.json'
-        # scrap_website(target_url, site_dump_path)
+        scrap_website(target_url, site_dump_path)
         insight = analyze_site_dump(target_url, site_dump_path)
         company = create_company(insight, target_url)
     return company.id
