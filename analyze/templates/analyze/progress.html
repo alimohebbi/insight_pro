@@ -8,7 +8,7 @@
             <div class="card-header py-3">
                 <h6 class="m-0 font-weight-bold text-primary">Analyze in progress</h6>
             </div>
-            <div class="card-body">
+            <div id="progress_card" class="card-body">
                 <div class="mb-1 small">We are gathering insights ...</div>
                 <div class="progress mb-4">
                     <div id="progress_bar" class="progress-bar" role="progressbar" style="width: 1%"
@@ -16,6 +16,15 @@
                 </div>
                 <a class="btn btn-primary" id="result_btn" style="display: none">
                     Go to Results Page
+                </a>
+
+            </div>
+
+            <div id="error_card" class="card-body" style="display: none">
+                <div class="mb-1 small">Sorry, the website address is invalid or do not allow robots.</div>
+
+                <a class="btn btn-danger" href="{% url 'analyze:index' %}">
+                    Go to Search Page
                 </a>
 
             </div>
@@ -35,15 +44,25 @@
             },
             body: JSON.stringify({'target_url': target_url}), // Convert the data object to JSON
         })
-            .then(response => response.json())  // Assuming the response is JSON
+            .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                }
+            )  // Assuming the response is JSON
             .then(data => {
                 href = '{% url 'analyze:results' company_id='x'%}'
                 {#document.getElementById("result_href").href = href.replace('x', data.insight_id);#}
-                document.getElementById("result_btn").href = href.replace('x', data.insight_id);
+                document.getElementById("result_btn").href = href.replace('x', data.company_id);
                 document.getElementById("result_btn").style.display = "block";
                 document.getElementById("progress_bar").style.width = '100%';
+                console.log(data)
             })
             .catch(error => {
+                document.getElementById("error_card").style.display = "block";
+                document.getElementById("progress_card").style.display = "none";
+                console.log('errrrorr')
             });
 
         // Function to get the CSRF token from the cookie
