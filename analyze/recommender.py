@@ -4,6 +4,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 from analyze.models import Company
+from web_insight.settings import TFIDF_TRAIN_PATH
 
 
 class Recommender:
@@ -13,7 +14,7 @@ class Recommender:
 
     @classmethod
     def init_vectorizer(cls):
-        corpus = pd.read_csv('analyze/preprocessed-small.csv')
+        corpus = pd.read_csv(TFIDF_TRAIN_PATH)
         tfidf_vectorizer = TfidfVectorizer(use_idf=True, max_features=5000)
         cls.tfidf_vectorizer = tfidf_vectorizer.fit(corpus['description'])
 

@@ -124,6 +124,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 # VENV_PATH = '/Users/usiusi/Documents/Repositories/web_insight/venv/'
 PYTHON_PATH = os.path.join(BASE_DIR, 'venv/bin/python')
+TFIDF_TRAIN_PATH = os.path.join(BASE_DIR, 'analyze/preprocessed-small.csv')
 SCRAPER_PATH = os.path.join(BASE_DIR, "analyze/scraper.py")
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
