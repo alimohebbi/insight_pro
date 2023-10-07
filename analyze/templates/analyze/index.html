@@ -1,13 +1,23 @@
-
 {% extends "analyze/base.html" %}
 {% load crispy_forms_tags %}
 
 {% block main_content %}
-<form method="post">
-    {% csrf_token %}
-   <div class="col-6">{{ form|crispy }}
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <!-- Basic Card Example -->
+   <div class="col-xl-6">
+    <div class="card shadow mb-4 ">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Company Web Address </h6>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div>{{ form|crispy }}
+                    <button type="submit" class="btn btn-primary">Start Analyzing</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
    </div>
-</form>
 
 {% endblock %}
