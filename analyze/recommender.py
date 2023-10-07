@@ -39,20 +39,15 @@ class Recommender:
 
     @classmethod
     def init_recommender(cls):
-        if not cls.tfidf_vectorizer:
-            cls.init_vectorizer()
-            cls.build_tfidf_matrix()
+        cls.init_vectorizer()
+        cls.build_tfidf_matrix()
 
     @classmethod
     def update_tfidf_matrix(cls):
         cls.build_tfidf_matrix()
 
 
-
-
-
 def find_similar_companies(target_company):
-    Recommender.init_recommender()
     similar_companies_id = Recommender.get_similar_companies_id(target_company)
     similar_companies = [Company.objects.get(id=company_id) for company_id in similar_companies_id]
     return similar_companies
