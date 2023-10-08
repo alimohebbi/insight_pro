@@ -1,4 +1,5 @@
-# Insight Pro [![Website Status](https://img.shields.io/badge/Website-Online-brightgreen)](https://www.insight-pro.info/) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/alimohebbi/insight_pro/blob/main/LICENSE)  [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8418646.svg)](https://doi.org/10.5281/zenodo.8418646) 
+# Insight Pro [![Website Status](https://img.shields.io/badge/Website-Online-brightgreen)](https://www.insight-pro.info/) [![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue)](https://www.gnu.org/licenses/gpl-3.0)
+  [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8418646.svg)](https://doi.org/10.5281/zenodo.8418646) 
 
 Welcome to Insight Pro (Insight Provider), a powerful web service that delivers in-depth insights about companies'
 culture and environment based on their website content. By utilizing cutting-edge Natural Language Processing (NLP)
