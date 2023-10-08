@@ -1,64 +1,81 @@
-# Insight Pro
+# Insight Pro [![Website Status](https://img.shields.io/badge/Website-Online-brightgreen)](https://www.insight-pro.info/) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/alimohebbi/insight_pro/blob/main/LICENSE)  [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8418646.svg)](https://doi.org/10.5281/zenodo.8418646) 
 
-Insight Pro (Insight Provider) is a web service that provides information about culture and environment of companies
-based
-on their
-website.
-The service receives the web address of a company, then it visits the company's web pages, analyze the text by NLP
-techniques,
-and returns valuable insights.
+Welcome to Insight Pro (Insight Provider), a powerful web service that delivers in-depth insights about companies'
+culture and environment based on their website content. By utilizing cutting-edge Natural Language Processing (NLP)
+techniques, Insight Pro extracts valuable information from company websites and offers a range of features to help you
+gain a better understanding of businesses.
 
 ## Online Availability
 
-The current version of the service is available at [www.insight-pro.info](https://www.insight-pro.info).
+You can access the current version of Insight Pro at [www.insight-pro.info](https://www.insight-pro.info).
 
 ## Overview
 
-This project provides useful information about companies in following groups:
+Insight Pro empowers you with valuable information about companies across various dimensions:
 
-- **Sentiment Analysis:** categorizes information on the website of a company as positive, negative, or
-  neutral. Sentiment analysis scores textual information and higher scores are associated with innovation, customer-
-  centric attitudes, and high moral attributes. The service gives an interpretation of the score and the rank of the
-  company among
-  available companies in the database.
-- **Highlights:** includes keywords of the company as a word cloud, and the top five most noticeable statements. The
-  service selects the statement by a *Statistical Summarization* technique.
-- **Domain of Focus:** encompasses technical directions, or higher level
-  abstract objectives of the company. The service uses a *Topic Modeling* technique to infer the domains.
-- **Similar Companies:** suggests the most similar companies to the target company. Knowing the competitors of a company
-  reveals information about the company and its characteristics. The service suggest the similar companies based on a "
-  *Item-Based Collaborative* recommender system.
-- **Leaderboard:** retrieves ten companies that gained the highest sentiment score.
+- **Sentiment Analysis:** Our service categorizes the content on a company's website as positive, negative, or neutral.
+  Sentiment analysis assigns scores to textual information, with higher scores indicating attributes like innovation,
+  customer-centric attitudes, and strong moral values. The service not only provides a sentiment score but also
+  interprets it and ranks the company among others in the database.
 
-## Installing
+- **Highlights:** Gain a quick understanding of a company's focus areas with a word cloud featuring prominent keywords.
+  Additionally, Insight Pro identifies the top five most significant statements on the website using Statistical
+  Summarization techniques.
 
-The web service requires a host that includes python3.9. You can run the service by following below steps:
+- **Domain of Focus:** Discover the technical directions or high-level abstract objectives of a company. Insight Pro
+  employs Topic Modeling techniques to infer the domains that a company specializes in.
 
-1. Install dependencies:
-    ```
-   pip install -r requirments
+- **Similar Companies:** Uncover competitors and industry peers for a better grasp of a company's position in the
+  market. Our service suggests similar companies using an advanced Item-Based Collaborative Recommender System. Our
+  service employs an advanced Item-Based Collaborative Recommender System that continually adapts, learning new
+  associations as the database expands.
+
+- **Leaderboard:** Access a list of the top ten companies with the highest sentiment scores, allowing you to identify
+  industry leaders.
+
+## Installation
+
+To run Insight Pro on your own host, make sure you have Python 3.9 or higher installed and follow these steps:
+
+1. Install dependencies by running the following command in your terminal:
+
+   ```bash
+   pip install -r requirements.txt
    ```
-2. Generate Django secret key using the code below in python. Then, add it
-   to [secret_template.py](web_insight/secret_template.py), and rename the file
-   to `secret.py`.
-    ```
+
+2. Generate a Django secret key using the following Python code. Add the generated key
+   to [secret_template.py](web_insight/secret_template.py), and rename the file to `secret.py`:
+
+   ```python
    import secrets
-    secret_key = secrets.token_hex(50)
-    print(secret_key)
+   secret_key = secrets.token_hex(50)
+   print(secret_key)
    ```
-3. Set the path to python in [settings.py](web_insight/settings.py).
-4. Create Django tables.
-    ```
-    python manage.py makemigrations analyze
-    python manage.py migrate analyze
-    python manage.py makemigrations
-    python manage.py migrate
-    ```
-5. Collect static files.
+
+3. Set the path to Python in [settings.py](web_insight/settings.py).
+
+4. Create Django database tables by running these commands:
+
+   ```bash
+   python manage.py makemigrations analyze
+   python manage.py migrate analyze
+   python manage.py makemigrations
+   python manage.py migrate
    ```
+
+5. Collect static files with the following command:
+
+   ```bash
    python manage.py collectstatic
    ```
-6. Run the server.
-   ```
+
+6. Finally, start the server by running:
+
+   ```bash
    python manage.py runserver
    ```
+
+Now, you have your own instance of Insight Pro up and running locally.
+
+Feel free to explore and utilize Insight Pro to gain valuable insights into companies' cultures and environments
+effortlessly.
