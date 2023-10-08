@@ -33,6 +33,12 @@ Insight Pro empowers you with valuable information about companies across variou
 - **Leaderboard:** Access a list of the top ten companies with the highest sentiment scores, allowing you to identify
   industry leaders.
 
+## Screenshots
+
+![Alt Text](screenshots/screenshot1.png)
+![Alt Text](screenshots/screenshot2.png)
+![Alt Text](screenshots/screenshot3.png)
+
 ## Installation
 
 To run Insight Pro on your own host, make sure you have Python 3.9 or higher installed and follow these steps:
