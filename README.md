@@ -1,7 +1,7 @@
 # Insight Pro [![Website Status](https://img.shields.io/badge/Website-Online-brightgreen)](https://www.insight-pro.info/) [![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue)](https://www.gnu.org/licenses/gpl-3.0) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8418646.svg)](https://doi.org/10.5281/zenodo.8418646) 
 
 Welcome to Insight Pro (Insight Provider), a powerful web service that delivers in-depth insights about companies'
-culture and environment based on their website content. By utilizing cutting-edge Natural Language Processing (NLP)
+culture and environment based on their website content. By utilizing cutting-edge Natural Language Processing (NLP) and Artificial Intelligence (AI)
 techniques, Insight Pro extracts valuable information from company websites and offers a range of features to help you
 gain a better understanding of businesses.
 
